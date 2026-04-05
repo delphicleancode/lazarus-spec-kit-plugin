@@ -1,0 +1,28 @@
+# Lazarus / FPC build artifacts
+*.o
+*.or
+*.ppu
+*.a
+*.so
+*.dll
+*.dylib
+*.exe
+
+# Lazarus IDE/session artifacts
+*.compiled
+*.lps
+*.lps~
+*.bak
+*.tmp
+
+# Logs and temporary outputs
+*.log
+
+# Local build outputs
+lib/
+
+# Local backups
+backup/
+
+# Optional local clone of skills repository
+lazarus-spec-kit/

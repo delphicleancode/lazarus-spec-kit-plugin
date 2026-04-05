@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <Package Version="5">
+    <Name Value="LazSpecWizard"/>
+    <Type Value="DesignTime"/>
+    <Author Value="DelphiCleanCode"/>
+    <CompilerOptions>
+      <Version Value="11"/>
+      <SearchPaths>
+        <IncludeFiles Value="src"/>
+        <OtherUnitFiles Value="src/registration;src/ui;src/core;src/infra;src/ide"/>
+        <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
+      </SearchPaths>
+    </CompilerOptions>
+    <Description Value="LazarusSpecKit — IDE Plugin with AI Chat and SDD Generation. Integrates Groq/Ollama AI in Ask/Plan/Agent modes for Spec-Driven Development."/>
+    <License Value="MIT"/>
+    <Version Minor="1"/>
+    <Files>
+      <Item>
+        <Filename Value="src/registration/LazSpecWizardReg.pas"/>
+        <HasRegisterProc Value="True"/>
+        <UnitName Value="LazSpecWizardReg"/>
+      </Item>
+      <Item>
+        <Filename Value="src/ui/frmSpecWizard.pas"/>
+        <UnitName Value="frmSpecWizard"/>
+      </Item>
+      <Item>
+        <Filename Value="src/ui/dlgSpecSettings.pas"/>
+        <UnitName Value="dlgSpecSettings"/>
+      </Item>
+      <Item>
+        <Filename Value="src/core/SDDEngine.pas"/>
+        <UnitName Value="SDDEngine"/>
+      </Item>
+      <Item>
+        <Filename Value="src/core/PromptBuilder.pas"/>
+        <UnitName Value="PromptBuilder"/>
+      </Item>
+      <Item>
+        <Filename Value="src/core/ContextMemory.pas"/>
+        <UnitName Value="ContextMemory"/>
+      </Item>
+      <Item>
+        <Filename Value="src/infra/BaseAIClient.pas"/>
+        <UnitName Value="BaseAIClient"/>
+      </Item>
+      <Item>
+        <Filename Value="src/infra/GroqClient.pas"/>
+        <UnitName Value="GroqClient"/>
+      </Item>
+      <Item>
+        <Filename Value="src/infra/SkillsLoader.pas"/>
+        <UnitName Value="SkillsLoader"/>
+      </Item>
+      <Item>
+        <Filename Value="src/infra/SpecSettings.pas"/>
+        <UnitName Value="SpecSettings"/>
+      </Item>
+      <Item>
+        <Filename Value="src/infra/LazSpecLang.pas"/>
+        <UnitName Value="LazSpecLang"/>
+      </Item>
+      <Item>
+        <Filename Value="src/ide/EditorHelper.pas"/>
+        <UnitName Value="EditorHelper"/>
+      </Item>
+      <Item>
+        <Filename Value="src/ide/ProjectHelper.pas"/>
+        <UnitName Value="ProjectHelper"/>
+      </Item>
+      <Item>
+        <Filename Value="src/ide/FileCreator.pas"/>
+        <UnitName Value="FileCreator"/>
+      </Item>
+      <Item>
+        <Filename Value="src/core/AICompleter.pas"/>
+        <UnitName Value="AICompleter"/>
+      </Item>
+      <Item>
+        <Filename Value="src/ide/AICompletionHandler.pas"/>
+        <UnitName Value="AICompletionHandler"/>
+      </Item>
+      <Item>
+        <Filename Value="src/ide/CodeAssistantHandler.pas"/>
+        <UnitName Value="CodeAssistantHandler"/>
+      </Item>
+      <Item>
+        <Filename Value="src/ui/frmCodeAssistant.pas"/>
+        <UnitName Value="frmCodeAssistant"/>
+      </Item>
+      <Item>
+        <Filename Value="src/ui/frmCodeAssistant.lfm"/>
+        <Type Value="LFM"/>
+      </Item>
+    </Files>
+    <RequiredPkgs>
+      <Item>
+        <PackageName Value="SynEditDsgn"/>
+      </Item>
+      <Item>
+        <PackageName Value="IDEIntf"/>
+      </Item>
+      <Item>
+        <PackageName Value="LCL"/>
+      </Item>
+      <Item>
+        <PackageName Value="SynEdit"/>
+      </Item>
+      <Item>
+        <PackageName Value="FCL"/>
+      </Item>
+    </RequiredPkgs>
+    <UsageOptions>
+      <UnitPath Value="$(PkgOutDir)"/>
+    </UsageOptions>
+    <PublishOptions>
+      <Version Value="2"/>
+    </PublishOptions>
+  </Package>
+</CONFIG>

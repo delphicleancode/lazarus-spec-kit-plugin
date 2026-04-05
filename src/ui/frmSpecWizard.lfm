@@ -1,0 +1,309 @@
+object SpecWizardForm: TSpecWizardForm
+  Left = 0
+  Height = 600
+  Top = 0
+  Width = 783
+  Caption = 'Spec Wizard'
+  ClientHeight = 600
+  ClientWidth = 783
+  LCLVersion = '4.4.0.0'
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  OnShow = FormShow
+  object pnlToolbar: TPanel
+    Left = 0
+    Height = 36
+    Top = 0
+    Width = 783
+    Align = alTop
+    BevelOuter = bvNone
+    ClientHeight = 36
+    ClientWidth = 783
+    TabOrder = 0
+    object btnAsk: TSpeedButton
+      Left = 4
+      Height = 28
+      Top = 4
+      Width = 60
+      AllowAllUp = True
+      Caption = 'Ask'
+      Down = True
+      GroupIndex = 1
+      OnClick = btnAskClick
+    end
+    object btnPlan: TSpeedButton
+      Left = 68
+      Height = 28
+      Top = 4
+      Width = 60
+      AllowAllUp = True
+      Caption = 'Plan'
+      GroupIndex = 1
+      OnClick = btnPlanClick
+    end
+    object btnAgent: TSpeedButton
+      Left = 132
+      Height = 28
+      Top = 4
+      Width = 60
+      AllowAllUp = True
+      Caption = 'Agent'
+      GroupIndex = 1
+      OnClick = btnAgentClick
+    end
+    object btnSettings: TSpeedButton
+      Left = 576
+      Height = 28
+      Top = 4
+      Width = 105
+      Anchors = [akTop, akRight]
+      Caption = 'Settings'
+      OnClick = btnSettingsClick
+    end
+    object btnExport: TSpeedButton
+      Left = 685
+      Height = 28
+      Top = 4
+      Width = 60
+      Anchors = [akTop, akRight]
+      Caption = 'Export'
+      OnClick = btnExportClick
+    end
+    object btnClear: TSpeedButton
+      Left = 749
+      Height = 28
+      Top = 4
+      Width = 28
+      Anchors = [akTop, akRight]
+      Caption = 'X'
+      OnClick = btnClearClick
+    end
+  end
+  object pnlMain: TPanel
+    Left = 0
+    Height = 431
+    Top = 36
+    Width = 783
+    Align = alClient
+    BevelOuter = bvNone
+    ClientHeight = 431
+    ClientWidth = 783
+    TabOrder = 1
+    object pnlSkills: TPanel
+      Left = 0
+      Height = 431
+      Top = 0
+      Width = 323
+      Align = alLeft
+      BevelOuter = bvNone
+      ClientHeight = 431
+      ClientWidth = 323
+      TabOrder = 0
+      object lblSkills: TLabel
+        Left = 4
+        Height = 15
+        Top = 4
+        Width = 26
+        Caption = 'Skills'
+      end
+      object clbSkills: TCheckListBox
+        Left = 0
+        Height = 407
+        Top = 24
+        Width = 323
+        Align = alBottom
+        Anchors = [akTop, akLeft, akRight, akBottom]
+        ItemHeight = 0
+        TabOrder = 0
+      end
+    end
+    object splSkills: TSplitter
+      Left = 323
+      Height = 431
+      Top = 0
+      Width = 5
+    end
+    object pnlOutput: TPanel
+      Left = 328
+      Height = 431
+      Top = 0
+      Width = 455
+      Align = alClient
+      BevelOuter = bvNone
+      ClientHeight = 431
+      ClientWidth = 455
+      TabOrder = 1
+      inline synOutput: TSynEdit
+        Left = 0
+        Height = 431
+        Top = 0
+        Width = 455
+        Align = alClient
+        Font.Height = -13
+        Font.Name = 'Courier New'
+        Font.Pitch = fpFixed
+        Font.Quality = fqNonAntialiased
+        ParentColor = False
+        ParentFont = False
+        TabOrder = 0
+        Gutter.Width = 57
+        Gutter.MouseActions = <>
+        RightGutter.Width = 0
+        RightGutter.MouseActions = <>
+        Highlighter = SynPasSyn
+        Keystrokes = <>
+        MouseActions = <>
+        MouseTextActions = <>
+        MouseSelActions = <>
+        VisibleSpecialChars = [vscSpace, vscTabAtLast]
+        ReadOnly = True
+        SelectedColor.BackPriority = 50
+        SelectedColor.ForePriority = 50
+        SelectedColor.FramePriority = 50
+        SelectedColor.BoldPriority = 50
+        SelectedColor.ItalicPriority = 50
+        SelectedColor.UnderlinePriority = 50
+        SelectedColor.StrikeOutPriority = 50
+        BracketHighlightStyle = sbhsBoth
+        BracketMatchColor.Background = clNone
+        BracketMatchColor.Foreground = clNone
+        BracketMatchColor.Style = [fsBold]
+        FoldedCodeColor.Background = clNone
+        FoldedCodeColor.Foreground = clGray
+        FoldedCodeColor.FrameColor = clGray
+        MouseLinkColor.Background = clNone
+        MouseLinkColor.Foreground = clBlue
+        LineHighlightColor.Background = clNone
+        LineHighlightColor.Foreground = clNone
+        inline SynLeftGutterPartList1: TSynGutterPartList
+          object SynGutterMarks1: TSynGutterMarks
+            Width = 24
+            MouseActions = <>
+            MaxExtraMarksColums = 0
+            Options = [sgmoDeDuplicateMarksOnOverflow]
+            MarkupInfo.Background = clBtnFace
+            MarkupInfo.Foreground = clNone
+          end
+          object SynGutterLineNumber1: TSynGutterLineNumber
+            Width = 17
+            MouseActions = <>
+            MarkupInfo.Background = clBtnFace
+            MarkupInfo.Foreground = clNone
+            DigitCount = 2
+            ShowOnlyLineNumbersMultiplesOf = 1
+            ZeroStart = False
+            LeadingZeros = False
+          end
+          object SynGutterChanges1: TSynGutterChanges
+            Width = 4
+            MouseActions = <>
+            ModifiedColor = 59900
+            SavedColor = clGreen
+            MarkupInfo.Background = clNone
+            MarkupInfo.Foreground = clGreen
+            MarkupInfo.FrameColor = 59900
+          end
+          object SynGutterSeparator1: TSynGutterSeparator
+            Width = 2
+            MouseActions = <>
+            MarkupInfo.Background = clWhite
+            MarkupInfo.Foreground = clGray
+          end
+          object SynGutterCodeFolding1: TSynGutterCodeFolding
+            MouseActions = <>
+            MarkupInfo.Background = clNone
+            MarkupInfo.Foreground = clGray
+            MouseActionsExpanded = <>
+            MouseActionsCollapsed = <>
+          end
+        end
+      end
+    end
+  end
+  object pnlInput: TPanel
+    Left = 0
+    Height = 110
+    Top = 467
+    Width = 783
+    Align = alBottom
+    BevelOuter = bvNone
+    ClientHeight = 110
+    ClientWidth = 783
+    TabOrder = 2
+    object memInput: TMemo
+      Left = 0
+      Height = 110
+      Top = 0
+      Width = 783
+      Align = alClient
+      ScrollBars = ssVertical
+      TabOrder = 0
+      OnKeyDown = memInputKeyDown
+    end
+    object btnSend: TButton
+      Left = 701
+      Height = 30
+      Top = 78
+      Width = 78
+      Anchors = [akRight, akBottom]
+      Caption = 'Send'
+      Default = True
+      Enabled = False
+      TabOrder = 1
+      OnClick = btnSendClick
+    end
+    object btnCancel: TButton
+      Left = 617
+      Height = 30
+      Top = 78
+      Width = 80
+      Anchors = [akRight, akBottom]
+      Caption = 'Cancel'
+      Enabled = False
+      TabOrder = 4
+      OnClick = btnCancelClick
+    end
+    object btnCopy: TButton
+      Left = 533
+      Height = 30
+      Top = 78
+      Width = 80
+      Anchors = [akRight, akBottom]
+      Caption = 'Copy'
+      TabOrder = 2
+      OnClick = btnCopyClick
+    end
+    object btnApply: TButton
+      Left = 447
+      Height = 30
+      Top = 78
+      Width = 82
+      Anchors = [akRight, akBottom]
+      Caption = 'Apply'
+      TabOrder = 3
+      Visible = False
+      OnClick = btnApplyClick
+    end
+  end
+  object statusBar: TStatusBar
+    Left = 0
+    Height = 23
+    Top = 577
+    Width = 783
+    Panels = <>
+    SimpleText = 'Initializing...'
+    SimplePanel = False
+  end
+  object SynPasSyn: TSynPasSyn
+    Enabled = False
+    CompilerMode = pcmDelphi
+    NestedComments = False
+    TypeHelpers = True
+    StringMultilineMode = []
+  end
+  object tmrInit: TTimer
+    Enabled = False
+    Interval = 100
+    OnTimer = tmrInitTimer
+  end
+end
