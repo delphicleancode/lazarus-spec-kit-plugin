@@ -1,4 +1,4 @@
-# LazarusSpecKit
+# LazarusSpecKit-Plugin
 
 **AI-powered Spec-Driven Development wizard for the Lazarus IDE.**
 
