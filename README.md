@@ -27,6 +27,12 @@ This repository contains the **plugin project only**. Skills are loaded from a s
 - Threading (TThread)
 - Horse REST Framework, IntraWeb, ACBr
 
+### Screenshots
+
+![Code Assistant](docs/CodeAssist.png)
+
+![Autocomplete](docs/Autocomplete.png)
+
 ---
 
 ## Requirements
