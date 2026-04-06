@@ -32,7 +32,7 @@ interface
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, StdCtrls,
   ExtCtrls, Buttons, SynEdit, SynHighlighterPas,
-  BaseAIClient, EditorHelper, SkillsLoader;
+  BaseAIClient, EditorHelper, SkillsLoader, SpecSettings;
 
 type
   TCodeAssistAction = (caaRefactor, caaExplain, caaComplete, caaFix, caaReview);
@@ -97,6 +97,7 @@ type
     procedure btnCloseClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
+    procedure FormShow(Sender: TObject);
   private
     FThread: TCodeAssistThread;
     FCurrentAction: TCodeAssistAction;
@@ -125,12 +126,24 @@ procedure ShowCodeAssistant(const ASelectedCode: string;
 implementation
 
 uses
-  SpecSettings, GroqClient, LazSpecLang, ProjectHelper;
+  GroqClient, QwenClient, OpenRouterClient, LazSpecLang, ProjectHelper;
 
 {$R *.lfm}
 
 // The constant SYSTEM_PROMPT and ACTION_PROMPTS have been replaced by the
 // language-aware TR() calls in BuildPrompt.  See LazSpecLang.pas.
+
+{ Helper function to get the correct URL based on provider }
+function GetCodeAssistProviderURL(const ASettings: TSpecSettings): string;
+begin
+  if ASettings.Provider = 'qwen' then
+    Result := ASettings.QwenURL
+  else if ASettings.Provider = 'openrouter' then
+    Result := ASettings.OpenRouterURL
+  else
+    Result := ASettings.OllamaURL;
+end;
+
 
 { TCodeAssistThread }
 
@@ -160,6 +173,10 @@ begin
   try
     if FProvider = 'ollama' then
       Client := TGroqClient.Create(FApiKey, FOllamaURL + '/v1')
+    else if FProvider = 'qwen' then
+      Client := TQwenClient.Create(FApiKey, FOllamaURL)
+    else if FProvider = 'openrouter' then
+      Client := TOpenRouterClient.Create(FApiKey, FOllamaURL)
     else
       Client := TGroqClient.Create(FApiKey);
 
@@ -218,6 +235,14 @@ begin
   end;
   FreeAndNil(FSkillIDs);
   FreeAndNil(FSkillsLoader);
+end;
+
+procedure TfrmCodeAssistant.FormShow(Sender: TObject);
+var
+  Settings : TSpecSettings;
+begin
+  Settings := TSpecSettings.Instance;
+  Caption := 'AI Code Assistant (' + Settings.Provider + ' - ' + Settings.Model + ')';
 end;
 
 procedure TfrmCodeAssistant.LoadSelectedCode(const ACode: string);
@@ -279,7 +304,7 @@ begin
     Settings.Model,
     Settings.ApiKey,
     Settings.Provider,
-    Settings.OllamaURL,
+    GetCodeAssistProviderURL(Settings),
     Settings.MaxTokens,
     Settings.Temperature
   );
@@ -313,8 +338,10 @@ procedure TfrmCodeAssistant.btnApplyClick(Sender: TObject);
 var
   ResultCode: string;
 begin
-  ResultCode := Trim(synResult.Text);
-  if ResultCode = '' then Exit;
+  ResultCode := synResult.SelText;
+  if Trim(ResultCode) = '' then
+    ResultCode := synResult.Text;
+  if Trim(ResultCode) = '' then Exit;
 
   TEditorHelper.ReplaceSelectedText(ResultCode);
   SetStatus(TR('CA.Applied'));
@@ -509,7 +536,7 @@ begin
 end;
 
 procedure ShowCodeAssistant(const ASelectedCode: string;
-  AAction: TCodeAssistAction);
+  AAction: TCodeAssistAction = caaExplain);
 begin
   if frmCodeAssistantInstance = nil then
     frmCodeAssistantInstance := TfrmCodeAssistant.Create(Application);

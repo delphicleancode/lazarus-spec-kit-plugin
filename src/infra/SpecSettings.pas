@@ -40,6 +40,8 @@ type
     FProvider: string;
     FModel: string;
     FOllamaURL: string;
+    FQwenURL: string;
+    FOpenRouterURL: string;
     FMaxTokens: Integer;
     FTemperature: Double;
     FSpecKitPath: string;
@@ -62,6 +64,8 @@ type
     property Provider: string read FProvider write FProvider;
     property Model: string read FModel write FModel;
     property OllamaURL: string read FOllamaURL write FOllamaURL;
+    property QwenURL: string read FQwenURL write FQwenURL;
+    property OpenRouterURL: string read FOpenRouterURL write FOpenRouterURL;
     property MaxTokens: Integer read FMaxTokens write FMaxTokens;
     property Temperature: Double read FTemperature write FTemperature;
     property SpecKitPath: string read FSpecKitPath write FSpecKitPath;
@@ -229,6 +233,8 @@ begin
   FProvider := 'groq';
   FModel := 'llama-3.3-70b-versatile';
   FOllamaURL := 'http://localhost:11434';
+  FQwenURL := 'https://dashscope.aliyuncs.com/compatible-mode/v1';
+  FOpenRouterURL := 'https://openrouter.ai/api/v1';
   FMaxTokens := 4096;
   FTemperature := 0.7;
   FSpecKitPath := '';
@@ -251,6 +257,8 @@ begin
       FProvider := Config.GetValue('Settings/Provider', 'groq');
       FModel := Config.GetValue('Settings/Model', 'llama-3.3-70b-versatile');
       FOllamaURL := Config.GetValue('Settings/OllamaURL', 'http://localhost:11434');
+      FQwenURL := Config.GetValue('Settings/QwenURL', 'https://dashscope.aliyuncs.com/compatible-mode/v1');
+      FOpenRouterURL := Config.GetValue('Settings/OpenRouterURL', 'https://openrouter.ai/api/v1');
       FMaxTokens := Config.GetValue('Settings/MaxTokens', 4096);
       FTemperature := StrToFloatDef(Config.GetValue('Settings/Temperature', '0.7'), 0.7);
       FSpecKitPath := Config.GetValue('Settings/SpecKitPath', '');
@@ -282,6 +290,8 @@ begin
       Config.SetDeleteValue('Settings/Provider', FProvider, 'groq');
       Config.SetDeleteValue('Settings/Model', FModel, 'llama-3.3-70b-versatile');
       Config.SetDeleteValue('Settings/OllamaURL', FOllamaURL, 'http://localhost:11434');
+      Config.SetDeleteValue('Settings/QwenURL', FQwenURL, 'https://dashscope.aliyuncs.com/compatible-mode/v1');
+      Config.SetDeleteValue('Settings/OpenRouterURL', FOpenRouterURL, 'https://openrouter.ai/api/v1');
       Config.SetDeleteValue('Settings/MaxTokens', FMaxTokens, 4096);
       Config.SetDeleteValue('Settings/Temperature', FloatToStr(FTemperature), '0.7');
       Config.SetDeleteValue('Settings/SpecKitPath', FSpecKitPath, '');

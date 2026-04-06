@@ -10,6 +10,7 @@ object frmCodeAssistant: TfrmCodeAssistant
   LCLVersion = '4.4.0.0'
   OnCreate = FormCreate
   OnDestroy = FormDestroy
+  OnShow = FormShow
   object pnlTop: TPanel
     Left = 0
     Height = 56
@@ -85,7 +86,6 @@ object frmCodeAssistant: TfrmCodeAssistant
       Top = 20
       Width = 90
       Caption = 'Executar'
-      Default = True
       TabOrder = 0
       OnClick = btnRunClick
     end
@@ -175,7 +175,6 @@ object frmCodeAssistant: TfrmCodeAssistant
       Top = 4
       Width = 80
       Anchors = [akTop, akRight, akBottom]
-      Cancel = True
       Caption = 'Fechar'
       TabOrder = 0
       OnClick = btnCloseClick

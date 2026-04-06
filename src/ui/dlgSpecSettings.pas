@@ -43,8 +43,8 @@ type
     edtApiKey: TEdit;
     lblModel: TLabel;
     cmbModel: TComboBox;
-    lblOllamaURL: TLabel;
-    edtOllamaURL: TEdit;
+    lblProviderURL: TLabel;
+    edtProviderURL: TEdit;
     lblMaxTokens: TLabel;
     seMaxTokens: TSpinEdit;
     lblTemperature: TLabel;
@@ -76,7 +76,7 @@ type
 implementation
 
 uses
-  BaseAIClient, GroqClient;
+  BaseAIClient, GroqClient, QwenClient, OpenRouterClient;
 
 {$R *.lfm}
 
@@ -98,6 +98,10 @@ begin
   // Provider
   if Settings.Provider = 'ollama' then
     cmbProvider.ItemIndex := 1
+  else if Settings.Provider = 'qwen' then
+    cmbProvider.ItemIndex := 2
+  else if Settings.Provider = 'openrouter' then
+    cmbProvider.ItemIndex := 3
   else
     cmbProvider.ItemIndex := 0;
 
@@ -108,7 +112,7 @@ begin
   cmbModel.Text := Settings.Model;
 
   // Ollama URL
-  edtOllamaURL.Text := Settings.OllamaURL;
+  edtProviderURL.Text := Settings.OllamaURL;
 
   // Max tokens
   seMaxTokens.Value := Settings.MaxTokens;
@@ -141,6 +145,10 @@ begin
   // Provider
   if cmbProvider.ItemIndex = 1 then
     Settings.Provider := 'ollama'
+  else if cmbProvider.ItemIndex = 2 then
+    Settings.Provider := 'qwen'
+  else if cmbProvider.ItemIndex = 3 then
+    Settings.Provider := 'openrouter'
   else
     Settings.Provider := 'groq';
 
@@ -151,7 +159,13 @@ begin
   Settings.Model := cmbModel.Text;
 
   // Ollama URL
-  Settings.OllamaURL := edtOllamaURL.Text;
+  Settings.OllamaURL := edtProviderURL.Text;
+
+  // Qwen URL (if visible)
+  if cmbProvider.ItemIndex = 2 then
+    Settings.QwenURL := edtProviderURL.Text
+  else if cmbProvider.ItemIndex = 3 then
+    Settings.OpenRouterURL := edtProviderURL.Text;
 
   // Max tokens
   Settings.MaxTokens := seMaxTokens.Value;
@@ -185,12 +199,20 @@ end;
 procedure TdlgSpecSettings.UpdateProviderUI;
 var
   IsGroq: Boolean;
+  Settings: TSpecSettings;
 begin
   IsGroq := (cmbProvider.ItemIndex = 0);
   edtApiKey.Enabled := IsGroq;
   lblApiKey.Enabled := IsGroq;
-  edtOllamaURL.Enabled := not IsGroq;
-  lblOllamaURL.Enabled := not IsGroq;
+  edtProviderURL.Enabled := not IsGroq;
+  lblProviderURL.Enabled := not IsGroq;
+
+  // Show the correct URL hint when switching providers
+  case cmbProvider.ItemIndex of
+    1: edtProviderURL.Text := TSpecSettings.Instance.OllamaURL;
+    2: edtProviderURL.Text := TSpecSettings.Instance.QwenURL;
+    3: edtProviderURL.Text := TSpecSettings.Instance.OpenRouterURL;
+  end;
 end;
 
 procedure TdlgSpecSettings.ApplyTranslations;
@@ -199,7 +221,13 @@ begin
   lblProvider.Caption           := TR('Settings.Provider');
   lblApiKey.Caption             := TR('Settings.ApiKey');
   lblModel.Caption              := TR('Settings.Model');
-  lblOllamaURL.Caption          := TR('Settings.OllamaURL');
+
+  case cmbProvider.ItemIndex of
+    1: lblProviderURL.Caption := TR('Settings.OllamaURL');
+    2: lblProviderURL.Caption := TR('Settings.QwenURL');
+    3: lblProviderURL.Caption := TR('Settings.OpenRouterURL');
+  end;
+
   lblMaxTokens.Caption          := TR('Settings.MaxTokens');
   lblTemperature.Caption        := TR('Settings.Temperature');
   lblSpecKitPath.Caption        := TR('Settings.SpecKitPath');
@@ -220,12 +248,13 @@ end;
 
 procedure TdlgSpecSettings.btnTestConnectionClick(Sender: TObject);
 var
-  Client: TGroqClient;
+  Client: ISpecAIClient;
 begin
   Screen.Cursor := crHourGlass;
   try
     if cmbProvider.ItemIndex = 0 then
     begin
+      // Groq
       Client := TGroqClient.Create(edtApiKey.Text);
       try
         if Client.TestConnection then
@@ -235,7 +264,37 @@ begin
           MessageDlg(TR('Conn.TestTitle'), TR('Conn.Fail'),
             mtError, [mbOK], 0);
       finally
-        Client.Free;
+        TGroqClient(Client).Free;
+      end;
+    end
+    else if cmbProvider.ItemIndex = 2 then
+    begin
+      // Qwen
+      Client := TQwenClient.Create(edtApiKey.Text);
+      try
+        if Client.TestConnection then
+          MessageDlg(TR('Conn.TestTitle'), TR('Conn.Success'),
+            mtInformation, [mbOK], 0)
+        else
+          MessageDlg(TR('Conn.TestTitle'), TR('Conn.Fail'),
+            mtError, [mbOK], 0);
+      finally
+        TQwenClient(Client).Free;
+      end;
+    end
+    else if cmbProvider.ItemIndex = 3 then
+    begin
+      // OpenRouter
+      Client := TOpenRouterClient.Create(edtApiKey.Text);
+      try
+        if Client.TestConnection then
+          MessageDlg(TR('Conn.TestTitle'), TR('Conn.Success'),
+            mtInformation, [mbOK], 0)
+        else
+          MessageDlg(TR('Conn.TestTitle'), TR('Conn.Fail'),
+            mtError, [mbOK], 0);
+      finally
+        TOpenRouterClient(Client).Free;
       end;
     end
     else

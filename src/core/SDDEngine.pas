@@ -70,7 +70,7 @@ type
 implementation
 
 uses
-  GroqClient;
+  GroqClient, QwenClient, OpenRouterClient;
 
 { TSDDEngine }
 
@@ -102,6 +102,10 @@ begin
   begin
     if Settings.Provider = 'groq' then
       FAIClient := TGroqClient.Create(Settings.ApiKey)
+    else if Settings.Provider = 'qwen' then
+      FAIClient := TQwenClient.Create(Settings.ApiKey, Settings.QwenURL)
+    else if Settings.Provider = 'openrouter' then
+      FAIClient := TOpenRouterClient.Create(Settings.ApiKey, Settings.OpenRouterURL)
     else
     begin
       // Ollama not yet implemented — fall back to Groq and notify via error

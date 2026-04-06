@@ -8,9 +8,8 @@ object dlgSpecSettings: TdlgSpecSettings
   ClientHeight = 570
   ClientWidth = 450
   Position = poMainFormCenter
-  OnCreate = FormCreate
   LCLVersion = '4.4.0.0'
-
+  OnCreate = FormCreate
   object pnlMain: TPanel
     Left = 8
     Height = 510
@@ -21,15 +20,13 @@ object dlgSpecSettings: TdlgSpecSettings
     ClientHeight = 510
     ClientWidth = 434
     TabOrder = 0
-
     object lblProvider: TLabel
       Left = 8
       Height = 15
       Top = 8
-      Width = 48
+      Width = 47
       Caption = 'Provider:'
     end
-
     object cmbProvider: TComboBox
       Left = 120
       Height = 23
@@ -39,37 +36,36 @@ object dlgSpecSettings: TdlgSpecSettings
       Items.Strings = (
         'Groq'
         'Ollama'
+        'Qwen'
+        'OpenRouter'
       )
       Style = csDropDownList
       TabOrder = 0
       OnChange = cmbProviderChange
     end
-
     object lblApiKey: TLabel
       Left = 8
       Height = 15
       Top = 44
-      Width = 46
+      Width = 43
       Caption = 'API Key:'
     end
-
     object edtApiKey: TEdit
       Left = 120
       Height = 23
       Top = 40
       Width = 300
       EchoMode = emPassword
+      PasswordChar = '*'
       TabOrder = 1
     end
-
     object lblModel: TLabel
       Left = 8
       Height = 15
       Top = 80
-      Width = 36
+      Width = 37
       Caption = 'Model:'
     end
-
     object cmbModel: TComboBox
       Left = 120
       Height = 23
@@ -81,19 +77,25 @@ object dlgSpecSettings: TdlgSpecSettings
         'llama-3.1-8b-instant'
         'mixtral-8x7b-32768'
         'gemma2-9b-it'
+        'qwen-turbo'
+        'qwen-plus'
+        'qwen-max'
+        'qwen-long'
+        'meta-llama/llama-3.3-70b-instruct'
+        'anthropic/claude-3.5-sonnet'
+        'google/gemini-2.0-flash-exp:free'
+        'mistralai/mistral-large'
       )
       TabOrder = 2
     end
-
-    object lblOllamaURL: TLabel
+    object lblProviderURL: TLabel
       Left = 8
       Height = 15
       Top = 116
-      Width = 66
-      Caption = 'Ollama URL:'
+      Width = 71
+      Caption = 'Provider URL:'
     end
-
-    object edtOllamaURL: TEdit
+    object edtProviderURL: TEdit
       Left = 120
       Height = 23
       Top = 112
@@ -101,15 +103,13 @@ object dlgSpecSettings: TdlgSpecSettings
       TabOrder = 3
       Text = 'http://localhost:11434'
     end
-
     object lblMaxTokens: TLabel
       Left = 8
       Height = 15
       Top = 152
-      Width = 63
+      Width = 65
       Caption = 'Max Tokens:'
     end
-
     object seMaxTokens: TSpinEdit
       Left = 120
       Height = 23
@@ -120,15 +120,13 @@ object dlgSpecSettings: TdlgSpecSettings
       TabOrder = 4
       Value = 4096
     end
-
     object lblTemperature: TLabel
       Left = 8
       Height = 15
       Top = 188
-      Width = 72
+      Width = 70
       Caption = 'Temperature:'
     end
-
     object edtTemperature: TEdit
       Left = 120
       Height = 23
@@ -137,15 +135,13 @@ object dlgSpecSettings: TdlgSpecSettings
       TabOrder = 5
       Text = '0.7'
     end
-
     object lblSpecKitPath: TLabel
       Left = 8
       Height = 15
       Top = 224
-      Width = 87
+      Width = 74
       Caption = 'Spec-Kit Path:'
     end
-
     object deSpecKitPath: TDirectoryEdit
       Left = 120
       Height = 23
@@ -154,17 +150,16 @@ object dlgSpecSettings: TdlgSpecSettings
       ShowHidden = False
       ButtonWidth = 23
       NumGlyphs = 1
+      MaxLength = 0
       TabOrder = 6
     end
-
     object lblLanguage: TLabel
       Left = 8
       Height = 15
       Top = 264
-      Width = 50
+      Width = 55
       Caption = 'Language:'
     end
-
     object cmbLanguage: TComboBox
       Left = 120
       Height = 23
@@ -178,7 +173,6 @@ object dlgSpecSettings: TdlgSpecSettings
       Style = csDropDownList
       TabOrder = 7
     end
-
     object btnTestConnection: TButton
       Left = 120
       Height = 30
@@ -188,7 +182,6 @@ object dlgSpecSettings: TdlgSpecSettings
       TabOrder = 8
       OnClick = btnTestConnectionClick
     end
-
     object gbAutoComplete: TGroupBox
       Left = 8
       Height = 120
@@ -198,26 +191,23 @@ object dlgSpecSettings: TdlgSpecSettings
       ClientHeight = 100
       ClientWidth = 414
       TabOrder = 9
-
       object chkAutoComplete: TCheckBox
         Left = 12
         Height = 19
         Top = 8
-        Width = 200
+        Width = 238
         Caption = 'Enable AI Autocomplete (Ctrl+Alt+Space)'
         Checked = True
         State = cbChecked
         TabOrder = 0
       end
-
       object lblACMaxTokens: TLabel
         Left = 12
         Height = 15
         Top = 40
-        Width = 63
+        Width = 65
         Caption = 'Max Tokens:'
       end
-
       object seACMaxTokens: TSpinEdit
         Left = 140
         Height = 23
@@ -228,15 +218,13 @@ object dlgSpecSettings: TdlgSpecSettings
         TabOrder = 1
         Value = 256
       end
-
       object lblACTemperature: TLabel
         Left = 12
         Height = 15
         Top = 72
-        Width = 72
+        Width = 70
         Caption = 'Temperature:'
       end
-
       object edtACTemperature: TEdit
         Left = 140
         Height = 23
@@ -247,7 +235,6 @@ object dlgSpecSettings: TdlgSpecSettings
       end
     end
   end
-
   object btnOK: TButton
     Left = 276
     Height = 30
@@ -259,7 +246,6 @@ object dlgSpecSettings: TdlgSpecSettings
     TabOrder = 1
     OnClick = btnOKClick
   end
-
   object btnCancel: TButton
     Left = 362
     Height = 30
