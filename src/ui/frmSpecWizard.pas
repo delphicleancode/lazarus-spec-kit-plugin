@@ -212,7 +212,12 @@ begin
 end;
 
 procedure TSpecWizardForm.FormShow(Sender: TObject);
+var
+  Settings : TSpecSettings;
 begin
+  Settings := TSpecSettings.Instance;
+  Caption := 'Spec Wizard (' + Settings.Provider + ' - ' + Settings.Model + ')';
+
   // Start the deferred init timer on first show
   if not FInitialized then
     tmrInit.Enabled := True;

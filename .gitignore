@@ -26,3 +26,5 @@ backup/
 
 # Optional local clone of skills repository
 lazarus-spec-kit/
+/.qwen
+/docs/Autocomplete2.png
