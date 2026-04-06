@@ -31,42 +31,60 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, StdCtrls, ExtCtrls,
-  SynEdit, SynHighlighterPas, LCLType;
+  SynEdit, SynHighlighterPas, LCLType, SpecSettings, LazSpecLang;
 
 type
+  TCompletionPreviewAction = (cpaCancel, cpaApply, cpaNext);
+
   { TfrmCompletionPreview }
   TfrmCompletionPreview = class(TForm)
     pnlButtons: TPanel;
     lblHint: TLabel;
     btnApply: TButton;
     btnCancel: TButton;
+    btnNext: TButton;
     synPreview: TSynEdit;
     SynPasSyn1: TSynPasSyn;
     procedure FormCreate(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+  private
+    procedure ApplyTranslations;
   public
     function GetTextToInsert: string;
     procedure LoadCompletion(const ACode: string);
   end;
 
-function ShowCompletionPreview(const ACode: string; AX, AY: Integer): string;
+function ShowCompletionPreview(const ACode: string; AX, AY: Integer;
+  out ATextToInsert: string; ACanSuggestNext: Boolean = True): TCompletionPreviewAction;
 
 implementation
 
 {$R *.lfm}
 
-function ShowCompletionPreview(const ACode: string; AX, AY: Integer): string;
+function ShowCompletionPreview(const ACode: string; AX, AY: Integer;
+  out ATextToInsert: string; ACanSuggestNext: Boolean): TCompletionPreviewAction;
 var
   Frm: TfrmCompletionPreview;
 begin
-  Result := '';
+  ATextToInsert := '';
+  Result := cpaCancel;
   Frm := TfrmCompletionPreview.Create(Application);
   try
     Frm.LoadCompletion(ACode);
+    Frm.btnNext.Visible := ACanSuggestNext;
     Frm.Left := AX;
     Frm.Top := AY;
-    if Frm.ShowModal = mrOk then
-      Result := Frm.GetTextToInsert;
+    case Frm.ShowModal of
+      mrOk:
+      begin
+        ATextToInsert := Frm.GetTextToInsert;
+        Result := cpaApply;
+      end;
+      mrRetry:
+        Result := cpaNext;
+    else
+      Result := cpaCancel;
+    end;
   finally
     Frm.Free;
   end;
@@ -78,6 +96,21 @@ procedure TfrmCompletionPreview.FormCreate(Sender: TObject);
 begin
   synPreview.Highlighter := SynPasSyn1;
   synPreview.Font.Quality := fqDefault;
+  btnNext.ModalResult := mrRetry;
+  ApplyTranslations;
+end;
+
+procedure TfrmCompletionPreview.ApplyTranslations;
+var
+  Settings: TSpecSettings;
+begin
+  Settings := TSpecSettings.Instance;
+  Caption := TR('Form.CompletionPreview') +
+    ' (' + Settings.Provider + ' - ' + Settings.Model + ')';
+  lblHint.Caption := TR('Completion.Hint');
+  btnApply.Caption := TR('Btn.ApplyCode');
+  btnCancel.Caption := TR('Btn.Cancel');
+  btnNext.Caption := TR('Btn.NextSuggestion');
 end;
 
 procedure TfrmCompletionPreview.FormKeyDown(Sender: TObject; var Key: Word;

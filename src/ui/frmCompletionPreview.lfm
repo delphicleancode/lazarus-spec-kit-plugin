@@ -1,37 +1,37 @@
 object frmCompletionPreview: TfrmCompletionPreview
   Left = 0
-  Height = 320
+  Height = 390
   Top = 0
-  Width = 560
+  Width = 753
   BorderStyle = bsSizeToolWin
   Caption = 'AI Completion'
-  ClientHeight = 320
-  ClientWidth = 560
+  ClientHeight = 390
+  ClientWidth = 753
   FormStyle = fsStayOnTop
   KeyPreview = True
-  Position = poDesigned
   ShowInTaskBar = stNever
+  LCLVersion = '4.4.0.0'
   OnCreate = FormCreate
   OnKeyDown = FormKeyDown
   object pnlButtons: TPanel
     Left = 0
     Height = 32
-    Top = 288
-    Width = 560
+    Top = 358
+    Width = 753
     Align = alBottom
     BevelOuter = bvNone
     ClientHeight = 32
-    ClientWidth = 560
+    ClientWidth = 753
     TabOrder = 1
     object lblHint: TLabel
       Left = 8
       Height = 15
       Top = 8
-      Width = 270
+      Width = 236
       Caption = 'Select lines to insert partially, or Apply for all.'
     end
     object btnApply: TButton
-      Left = 388
+      Left = 495
       Height = 26
       Top = 3
       Width = 80
@@ -41,23 +41,33 @@ object frmCompletionPreview: TfrmCompletionPreview
       ModalResult = 1
       TabOrder = 0
     end
-    object btnCancel: TButton
-      Left = 474
+    object btnNext: TButton
+      Left = 581
       Height = 26
       Top = 3
       Width = 80
       Anchors = [akTop, akRight]
-      Caption = 'Cancel'
-      Cancel = True
-      ModalResult = 2
+      Caption = 'Next'
+      ModalResult = 6
       TabOrder = 1
     end
+    object btnCancel: TButton
+      Left = 667
+      Height = 26
+      Top = 3
+      Width = 80
+      Anchors = [akTop, akRight]
+      Cancel = True
+      Caption = 'Cancel'
+      ModalResult = 2
+      TabOrder = 2
+    end
   end
-  object synPreview: TSynEdit
+  inline synPreview: TSynEdit
     Left = 0
-    Height = 288
+    Height = 358
     Top = 0
-    Width = 560
+    Width = 753
     Align = alClient
     Font.Height = -13
     Font.Name = 'Courier New'
@@ -66,7 +76,7 @@ object frmCompletionPreview: TfrmCompletionPreview
     ParentColor = False
     ParentFont = False
     TabOrder = 0
-    Gutter.Width = 57
+    Gutter.Width = 47
     Gutter.MouseActions = <>
     RightGutter.Width = 0
     RightGutter.MouseActions = <>
@@ -74,6 +84,7 @@ object frmCompletionPreview: TfrmCompletionPreview
     MouseActions = <>
     MouseTextActions = <>
     MouseSelActions = <>
+    VisibleSpecialChars = [vscSpace, vscTabAtLast]
     ReadOnly = True
     SelectedColor.BackPriority = 50
     SelectedColor.ForePriority = 50
@@ -130,6 +141,11 @@ object frmCompletionPreview: TfrmCompletionPreview
     end
   end
   object SynPasSyn1: TSynPasSyn
+    Enabled = False
+    CompilerMode = pcmDelphi
+    NestedComments = False
+    TypeHelpers = True
+    StringMultilineMode = []
     Left = 24
     Top = 152
   end

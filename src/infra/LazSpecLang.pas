@@ -282,6 +282,17 @@ begin
       if P then Result := 'Resultado AI:' else Result := 'AI Result:';
 
     // -----------------------------------------------------------------------
+    // Completion preview form (autocomplete)
+    // -----------------------------------------------------------------------
+    'Form.CompletionPreview':
+      if P then Result := 'Autocomplete IA' else Result := 'AI Completion';
+    'Completion.Hint':
+      if P then Result := 'Selecione linhas para inserir parcialmente, ou Aplicar para tudo.'
+           else Result := 'Select lines to insert partially, or Apply for all.';
+    'Btn.NextSuggestion':
+      if P then Result := 'Próxima' else Result := 'Next';
+
+    // -----------------------------------------------------------------------
     // Code Assistant runtime status messages
     // -----------------------------------------------------------------------
     'CA.Ready':

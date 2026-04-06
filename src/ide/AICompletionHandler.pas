@@ -65,8 +65,17 @@ type
     FThread: TAICompletionThread;
     FBusy: Boolean;
     FCursorPos: TPoint;
+    FBaseMessages: TAIMessages;
+    FModel: string;
+    FApiKey: string;
+    FProvider: string;
+    FProviderURL: string;
+    FMaxTokens: Integer;
+    FTemperature: Double;
     procedure HandleThreadDone(Sender: TObject);
     procedure ShowCompletionPreview(const ACode: string);
+    function BuildNextMessages(const AShownSuggestions: TStrings): TAIMessages;
+    function RequestNextSuggestion(const AShownSuggestions: TStrings): string;
     function GetCurrentSynEdit: TCustomSynEdit;
     procedure OnKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
   public
@@ -166,6 +175,7 @@ begin
   FCompleter := TAICompleter.Create;
   FThread := nil;
   FBusy := False;
+  SetLength(FBaseMessages, 0);
   Application.AddOnKeyDownBeforeHandler(@OnKeyDown);
 end;
 
@@ -248,6 +258,15 @@ begin
   Messages := FCompleter.BuildCompletionMessages(
     SourceCode, CursorLine, CursorCol, FileName);
 
+  // Preserve initial context/settings so preview can request alternative suggestions.
+  FBaseMessages := Copy(Messages);
+  FModel := Settings.Model;
+  FApiKey := Settings.ApiKey;
+  FProvider := Settings.Provider;
+  FProviderURL := GetProviderURL(Settings);
+  FMaxTokens := Settings.AutoCompleteMaxTokens;
+  FTemperature := Settings.AutoCompleteTemperature;
+
   // Clean up previous thread
   if FThread <> nil then
   begin
@@ -291,7 +310,11 @@ procedure TAICompletionHandler.ShowCompletionPreview(const ACode: string);
 var
   SynEdit: TCustomSynEdit;
   P: TPoint;
+  Action: TCompletionPreviewAction;
+  CurrentCode: string;
   TextToInsert: string;
+  ShownSuggestions: TStringList;
+  NextCode: string;
 begin
   SynEdit := GetCurrentSynEdit;
   if SynEdit = nil then Exit;
@@ -301,11 +324,93 @@ begin
     SynEdit.RowColumnToPixels(
       SynEdit.LogicalToPhysicalPos(SynEdit.LogicalCaretXY)));
 
-  TextToInsert := frmCompletionPreview.ShowCompletionPreview(
-    ACode, P.X, P.Y + SynEdit.LineHeight);
+  ShownSuggestions := TStringList.Create;
+  try
+    CurrentCode := ACode;
+    repeat
+      Action := frmCompletionPreview.ShowCompletionPreview(
+        CurrentCode, P.X, P.Y + SynEdit.LineHeight, TextToInsert, True);
 
-  if TextToInsert <> '' then
-    TEditorHelper.InsertTextAtCursor(TextToInsert);
+      if Action = cpaApply then
+      begin
+        if TextToInsert <> '' then
+          TEditorHelper.InsertTextAtCursor(TextToInsert);
+        Exit;
+      end;
+
+      if Action <> cpaNext then
+        Exit;
+
+      ShownSuggestions.Add(CurrentCode);
+      NextCode := RequestNextSuggestion(ShownSuggestions);
+      if NextCode = '' then
+        Exit;
+
+      CurrentCode := NextCode;
+    until False;
+  finally
+    ShownSuggestions.Free;
+  end;
+end;
+
+function TAICompletionHandler.BuildNextMessages(
+  const AShownSuggestions: TStrings): TAIMessages;
+var
+  I, BaseCount: Integer;
+  ExclusionText: string;
+begin
+  BaseCount := Length(FBaseMessages);
+  if BaseCount = 0 then
+  begin
+    SetLength(Result, 0);
+    Exit;
+  end;
+
+  ExclusionText := '';
+  for I := 0 to AShownSuggestions.Count - 1 do
+    ExclusionText := ExclusionText + '- ' + AShownSuggestions[I] + LineEnding;
+
+  SetLength(Result, BaseCount + 2);
+  for I := 0 to BaseCount - 1 do
+    Result[I] := FBaseMessages[I];
+
+  Result[BaseCount] := CreateAIMessage('system',
+    'Generate ONE alternative completion using the same cursor context. ' +
+    'Do not repeat any previous suggestion. Return code only.');
+  Result[BaseCount + 1] := CreateAIMessage('user',
+    'Already suggested completions (do not repeat):' + LineEnding + ExclusionText);
+end;
+
+function TAICompletionHandler.RequestNextSuggestion(
+  const AShownSuggestions: TStrings): string;
+var
+  NextThread: TAICompletionThread;
+  Messages: TAIMessages;
+  Items: TAICompletionItems;
+begin
+  Result := '';
+  Messages := BuildNextMessages(AShownSuggestions);
+  if Length(Messages) = 0 then Exit;
+
+  NextThread := TAICompletionThread.Create(
+    Messages,
+    FModel,
+    FApiKey,
+    FProvider,
+    FProviderURL,
+    FMaxTokens,
+    FTemperature);
+  try
+    NextThread.Start;
+    NextThread.WaitFor;
+    if not NextThread.Success then Exit;
+
+    Items := FCompleter.ParseCompletionResponse(NextThread.Response);
+    if Length(Items) > 0 then
+      Result := Items[0].InsertText;
+  finally
+    NextThread.Free;
+  end;
 end;
 
 { Module-level procedures }
