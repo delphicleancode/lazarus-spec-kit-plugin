@@ -34,7 +34,6 @@ uses
 
 type
   TAICompletionItem = record
-    DisplayText: string;
     InsertText: string;
   end;
   TAICompletionItems = array of TAICompletionItem;
@@ -56,15 +55,17 @@ const
   COMPLETION_SYSTEM_PROMPT =
     'You are a Free Pascal/Lazarus intelligent code completion engine.' + sLineBreak +
     'You will receive source code with the cursor position marked as '#171'|CURSOR|'#187'.' + sLineBreak +
-    'Suggest up to 5 distinct code completions for the cursor position.' + sLineBreak +
+    'Provide exactly ONE complete code suggestion for the cursor position.' + sLineBreak +
     sLineBreak +
     'Rules:' + sLineBreak +
-    '- Each suggestion must be valid Free Pascal code' + sLineBreak +
-    '- Return one suggestion per line, prefixed with ">>> "' + sLineBreak +
-    '- For multi-line suggestions, use literal \n for newlines within the suggestion' + sLineBreak +
-    '- Do NOT include explanations, comments about suggestions, or markdown' + sLineBreak +
-    '- Suggestions should be natural continuations of the code at cursor' + sLineBreak +
-    '- Vary from short (single expression/statement) to longer (full blocks)' + sLineBreak +
+    '- Return ONLY the code that should be INSERTED at the cursor position' + sLineBreak +
+    '- Do NOT repeat code that already exists BEFORE the cursor marker' + sLineBreak +
+    '- Do NOT repeat code that already exists AFTER the cursor marker' + sLineBreak +
+    '- The suggestion must be valid Free Pascal code' + sLineBreak +
+    '- Return ONLY the code, no explanations, no comments, no markdown' + sLineBreak +
+    '- Do NOT wrap the code in ``` blocks' + sLineBreak +
+    '- The suggestion should be the best and most complete implementation' + sLineBreak +
+    '- Include the full algorithm/logic block that fits the cursor context' + sLineBreak +
     '- Respect current indentation and Pascal conventions' + sLineBreak +
     '- Consider the unit structure, existing types, variables, and methods' + sLineBreak +
     '- Use {$mode objfpc}{$H+}, T prefix for types, F for fields, A for parameters';
@@ -116,45 +117,34 @@ begin
   Result[0] := CreateAIMessage('system', COMPLETION_SYSTEM_PROMPT);
   Result[1] := CreateAIMessage('user',
     'File: ' + ExtractFileName(AFileName) + sLineBreak +
+    'Return ONLY the new code to INSERT at the '#171'|CURSOR|'#187' position. ' +
+    'Do NOT repeat any code that is already present before or after the cursor.' + sLineBreak +
     '```pascal' + sLineBreak +
     CodeWithCursor + sLineBreak +
     '```');
 end;
 
-function TAICompleter.ParseCompletionResponse(const AResponse: string): TAICompletionItems; 
-var 
-  Lines: TStringList; 
-  I, Count: Integer;  
-  Line, DisplayText, InsertText: string;
+function TAICompleter.ParseCompletionResponse(const AResponse: string): TAICompletionItems;
+var
+  Code: string;
 begin
   Result := nil;
-  Count := 0;
+  Code := Trim(AResponse);
+  if Code = '' then Exit;
 
-  Lines := TStringList.Create;
-  try
-    Lines.Text := AResponse;
-    for I := 0 to Lines.Count - 1 do
-    begin
-      Line := Trim(Lines[I]);
-      if Pos('>>> ', Line) = 1 then
-      begin
-        InsertText := Copy(Line, 5, MaxInt);
-        if InsertText = '' then Continue;
-
-        // Build display text: replace \n with visual marker, truncate
-        DisplayText := StringReplace(InsertText, '\n', ' '#8629' ', [rfReplaceAll]);
-        if Length(DisplayText) > 80 then
-          DisplayText := Copy(DisplayText, 1, 77) + '...';
-
-        Inc(Count);
-        SetLength(Result, Count);
-        Result[Count - 1].DisplayText := DisplayText;
-        Result[Count - 1].InsertText := InsertText;
-      end;
-    end;
-  finally
-    Lines.Free;
+  // Strip markdown fences if accidentally returned
+  if (Pos('```', Code) = 1) then
+  begin
+    Delete(Code, 1, Pos(#10, Code)); // remove first line (```pascal)
+    if Pos('```', Code) > 0 then
+      Code := Copy(Code, 1, Pos('```', Code) - 1);
+    Code := Trim(Code);
   end;
+
+  if Code = '' then Exit;
+
+  SetLength(Result, 1);
+  Result[0].InsertText := Code;
 end;
 
 end.

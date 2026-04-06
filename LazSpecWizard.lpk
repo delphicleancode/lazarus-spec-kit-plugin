@@ -93,6 +93,14 @@
         <Filename Value="src/ui/frmCodeAssistant.lfm"/>
         <Type Value="LFM"/>
       </Item>
+      <Item>
+        <Filename Value="src/ui/frmCompletionPreview.pas"/>
+        <UnitName Value="frmCompletionPreview"/>
+      </Item>
+      <Item>
+        <Filename Value="src/ui/frmCompletionPreview.lfm"/>
+        <Type Value="LFM"/>
+      </Item>
     </Files>
     <RequiredPkgs>
       <Item>

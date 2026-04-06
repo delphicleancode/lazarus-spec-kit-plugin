@@ -1,0 +1,136 @@
+object frmCompletionPreview: TfrmCompletionPreview
+  Left = 0
+  Height = 320
+  Top = 0
+  Width = 560
+  BorderStyle = bsSizeToolWin
+  Caption = 'AI Completion'
+  ClientHeight = 320
+  ClientWidth = 560
+  FormStyle = fsStayOnTop
+  KeyPreview = True
+  Position = poDesigned
+  ShowInTaskBar = stNever
+  OnCreate = FormCreate
+  OnKeyDown = FormKeyDown
+  object pnlButtons: TPanel
+    Left = 0
+    Height = 32
+    Top = 288
+    Width = 560
+    Align = alBottom
+    BevelOuter = bvNone
+    ClientHeight = 32
+    ClientWidth = 560
+    TabOrder = 1
+    object lblHint: TLabel
+      Left = 8
+      Height = 15
+      Top = 8
+      Width = 270
+      Caption = 'Select lines to insert partially, or Apply for all.'
+    end
+    object btnApply: TButton
+      Left = 388
+      Height = 26
+      Top = 3
+      Width = 80
+      Anchors = [akTop, akRight]
+      Caption = 'Apply'
+      Default = True
+      ModalResult = 1
+      TabOrder = 0
+    end
+    object btnCancel: TButton
+      Left = 474
+      Height = 26
+      Top = 3
+      Width = 80
+      Anchors = [akTop, akRight]
+      Caption = 'Cancel'
+      Cancel = True
+      ModalResult = 2
+      TabOrder = 1
+    end
+  end
+  object synPreview: TSynEdit
+    Left = 0
+    Height = 288
+    Top = 0
+    Width = 560
+    Align = alClient
+    Font.Height = -13
+    Font.Name = 'Courier New'
+    Font.Pitch = fpFixed
+    Font.Quality = fqNonAntialiased
+    ParentColor = False
+    ParentFont = False
+    TabOrder = 0
+    Gutter.Width = 57
+    Gutter.MouseActions = <>
+    RightGutter.Width = 0
+    RightGutter.MouseActions = <>
+    Keystrokes = <>
+    MouseActions = <>
+    MouseTextActions = <>
+    MouseSelActions = <>
+    ReadOnly = True
+    SelectedColor.BackPriority = 50
+    SelectedColor.ForePriority = 50
+    SelectedColor.FramePriority = 50
+    SelectedColor.BoldPriority = 50
+    SelectedColor.ItalicPriority = 50
+    SelectedColor.UnderlinePriority = 50
+    SelectedColor.StrikeOutPriority = 50
+    BracketHighlightStyle = sbhsBoth
+    BracketMatchColor.Background = clNone
+    BracketMatchColor.Foreground = clNone
+    BracketMatchColor.Style = [fsBold]
+    FoldedCodeColor.Background = clNone
+    FoldedCodeColor.Foreground = clGray
+    FoldedCodeColor.FrameColor = clGray
+    MouseLinkColor.Background = clNone
+    MouseLinkColor.Foreground = clBlue
+    LineHighlightColor.Background = clNone
+    LineHighlightColor.Foreground = clNone
+    inline SynLeftGutterPartList1: TSynGutterPartList
+      object SynGutterMarks1: TSynGutterMarks
+        Width = 24
+        MouseActions = <>
+        MaxExtraMarksColums = 0
+        Options = [sgmoDeDuplicateMarksOnOverflow]
+        MarkupInfo.Background = clBtnFace
+        MarkupInfo.Foreground = clNone
+      end
+      object SynGutterLineNumber1: TSynGutterLineNumber
+        Width = 17
+        MouseActions = <>
+        MarkupInfo.Background = clBtnFace
+        MarkupInfo.Foreground = clNone
+        DigitCount = 2
+        ShowOnlyLineNumbersMultiplesOf = 1
+        ZeroStart = False
+        LeadingZeros = False
+      end
+      object SynGutterChanges1: TSynGutterChanges
+        Width = 4
+        MouseActions = <>
+        ModifiedColor = 59900
+        SavedColor = clGreen
+        MarkupInfo.Background = clNone
+        MarkupInfo.Foreground = clGreen
+        MarkupInfo.FrameColor = 59900
+      end
+      object SynGutterSeparator1: TSynGutterSeparator
+        Width = 2
+        MouseActions = <>
+        MarkupInfo.Background = clWhite
+        MarkupInfo.Foreground = clGray
+      end
+    end
+  end
+  object SynPasSyn1: TSynPasSyn
+    Left = 24
+    Top = 152
+  end
+end

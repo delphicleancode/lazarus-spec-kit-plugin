@@ -30,8 +30,8 @@ unit AICompletionHandler;
 interface
 
 uses
-  Classes, SysUtils, Forms, Controls, LCLType, SynEdit, SynCompletion,
-  SrcEditorIntf, BaseAIClient, AICompleter;
+  Classes, SysUtils, Forms, Controls, LCLType, SynEdit,
+  SrcEditorIntf, BaseAIClient, AICompleter, SpecSettings;
 
 type
   { TAICompletionThread - Background thread for AI completion requests }
@@ -61,18 +61,12 @@ type
   { TAICompletionHandler - Manages AI code completion in the IDE editor }
   TAICompletionHandler = class
   private
-    FCompletion: TSynCompletion;
     FCompleter: TAICompleter;
     FThread: TAICompletionThread;
-    FInsertList: TStringList;
     FBusy: Boolean;
     FCursorPos: TPoint;
     procedure HandleThreadDone(Sender: TObject);
-    procedure HandleCodeCompletion(var Value: string;
-      SourceValue: string;
-      var SourceStart, SourceEnd: TPoint;
-      KeyChar: TUTF8Char; Shift: TShiftState);
-    procedure ShowCompletions(const AItems: TAICompletionItems);
+    procedure ShowCompletionPreview(const ACode: string);
     function GetCurrentSynEdit: TCustomSynEdit;
     procedure OnKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
   public
@@ -92,7 +86,20 @@ procedure TriggerAICompletion(Sender: TObject);
 implementation
 
 uses
-  SpecSettings, GroqClient;
+  GroqClient, QwenClient, OpenRouterClient, EditorHelper, frmCompletionPreview;
+
+
+{ Helper function to get the correct URL based on provider }
+function GetProviderURL(const ASettings: TSpecSettings): string;
+begin
+  if ASettings.Provider = 'qwen' then
+    Result := ASettings.QwenURL
+  else if ASettings.Provider = 'openrouter' then
+    Result := ASettings.OpenRouterURL
+  else
+    Result := ASettings.OllamaURL;
+end;
+
 
 { TAICompletionThread }
 
@@ -122,6 +129,10 @@ begin
   try
     if FProvider = 'ollama' then
       Client := TGroqClient.Create(FApiKey, FOllamaURL + '/v1')
+    else if FProvider = 'qwen' then
+      Client := TQwenClient.Create(FApiKey, FOllamaURL)
+    else if FProvider = 'openrouter' then
+      Client := TOpenRouterClient.Create(FApiKey, FOllamaURL)
     else
       Client := TGroqClient.Create(FApiKey);
 
@@ -153,13 +164,6 @@ constructor TAICompletionHandler.Create;
 begin
   inherited Create;
   FCompleter := TAICompleter.Create;
-  FInsertList := TStringList.Create;
-  FCompletion := TSynCompletion.Create(nil);
-  FCompletion.Width := 520;
-  FCompletion.NbLinesInWindow := 8;
-  FCompletion.ShowSizeDrag := True;
-  FCompletion.OnCodeCompletion := @HandleCodeCompletion;
-  FCompletion.LongLineHintType := sclpExtendRightOnly;
   FThread := nil;
   FBusy := False;
   Application.AddOnKeyDownBeforeHandler(@OnKeyDown);
@@ -178,8 +182,6 @@ begin
     end;
     FreeAndNil(FThread);
   end;
-  FreeAndNil(FCompletion);
-  FreeAndNil(FInsertList);
   FreeAndNil(FCompleter);
   inherited Destroy;
 end;
@@ -265,7 +267,7 @@ begin
     Settings.Model,
     Settings.ApiKey,
     Settings.Provider,
-    Settings.OllamaURL,
+    GetProviderURL(Settings),
     Settings.AutoCompleteMaxTokens,
     Settings.AutoCompleteTemperature);
   FThread.OnTerminate := @HandleThreadDone;
@@ -282,50 +284,28 @@ begin
 
   Items := FCompleter.ParseCompletionResponse(FThread.Response);
   if Length(Items) > 0 then
-    ShowCompletions(Items);
+    ShowCompletionPreview(Items[0].InsertText);
 end;
 
-procedure TAICompletionHandler.ShowCompletions(
-  const AItems: TAICompletionItems);
+procedure TAICompletionHandler.ShowCompletionPreview(const ACode: string);
 var
   SynEdit: TCustomSynEdit;
   P: TPoint;
-  I: Integer;
+  TextToInsert: string;
 begin
   SynEdit := GetCurrentSynEdit;
   if SynEdit = nil then Exit;
 
-  FCompletion.ItemList.Clear;
-  FInsertList.Clear;
-
-  for I := 0 to Length(AItems) - 1 do
-  begin
-    FCompletion.ItemList.Add(AItems[I].DisplayText);
-    FInsertList.Add(AItems[I].InsertText);
-  end;
-
-  FCompletion.Editor := SynEdit;
-
-  // Calculate screen position for the popup
+  // Position popup near the caret
   P := SynEdit.ClientToScreen(
     SynEdit.RowColumnToPixels(
       SynEdit.LogicalToPhysicalPos(SynEdit.LogicalCaretXY)));
-  FCompletion.Execute('', P.X, P.Y + SynEdit.LineHeight);
-end;
 
-procedure TAICompletionHandler.HandleCodeCompletion(var Value: string;
-  SourceValue: string;
-  var SourceStart, SourceEnd: TPoint;
-  KeyChar: TUTF8Char; Shift: TShiftState);
-begin
-  // Set source range to cursor position so text is inserted, not replaced
-  SourceStart := FCursorPos;
-  SourceEnd := FCursorPos;
-  // Replace display text with the stored insert text for this item
-  if (FCompletion.Position >= 0) and (FCompletion.Position < FInsertList.Count) then
-    Value := FInsertList[FCompletion.Position];
-  // Convert literal \n markers to real line breaks
-  Value := StringReplace(Value, '\n', LineEnding, [rfReplaceAll]);
+  TextToInsert := frmCompletionPreview.ShowCompletionPreview(
+    ACode, P.X, P.Y + SynEdit.LineHeight);
+
+  if TextToInsert <> '' then
+    TEditorHelper.InsertTextAtCursor(TextToInsert);
 end;
 
 { Module-level procedures }
